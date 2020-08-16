@@ -16,7 +16,7 @@ error() {
 parse_domains() {
     # For each configuration file in /etc/nginx/conf.d/*.conf*
     for conf_file in /etc/nginx/conf.d/*.conf*; do
-        sed -n -r -e 's&^\s*ssl_certificate_key\s*\/etc/letsencrypt/live/(.*)/privkey.pem;\s*(#.*)?$&\1&p' $conf_file | xargs echo
+        sed -n -r -e 's&^\s*server_name\s*(.*);\s*(#.*)?$&\1&p' $conf_file | xargs echo
     done
 }
 
@@ -83,7 +83,7 @@ is_renewal_required() {
     # If the file does not exist assume a renewal is required
     last_renewal_file="/etc/letsencrypt/live/$1/privkey.pem"
     [ ! -e "$last_renewal_file" ] && return;
-    
+
     # If the file exists, check if the last renewal was more than a week ago
     one_week_sec=604800
     now_sec=$(date -d now +%s)
