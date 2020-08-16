@@ -77,6 +77,31 @@ get_certificate() {
         --standalone --preferred-challenges http-01 --debug
 }
 
+get_multi_domain_certificate() {
+    echo "Getting certificates for domains \"$1\" on behalf of user $2"
+    PRODUCTION_URL='https://acme-v02.api.letsencrypt.org/directory'
+    STAGING_URL='https://acme-staging-v02.api.letsencrypt.org/directory'
+
+    if [ "${IS_STAGING}" = "1" ]; then
+        letsencrypt_url=$STAGING_URL
+        echo "Staging ..."
+    else
+        letsencrypt_url=$PRODUCTION_URL
+        echo "Production ..."
+    fi
+
+    domains_str=""
+
+    for domain in $1; do
+      domains_str="$domains_str -d $domain"
+    done
+
+    echo "running certbot ... $letsencrypt_url $1 $2"
+    certbot certonly --agree-tos --keep -n --text --email $2 --server \
+        $letsencrypt_url $domains_str --http-01-port 1337 \
+        --standalone --preferred-challenges http-01 --debug
+}
+
 # Given a domain name, return true if a renewal is required (last renewal
 # ran over a week ago or never happened yet), otherwise return false.
 is_renewal_required() {

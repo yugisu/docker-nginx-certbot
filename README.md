@@ -37,6 +37,8 @@ services:
             - 443:443/tcp
         environment:
             CERTBOT_EMAIL: owner@company.com
+            # IS_STAGING: 1 if you want to test
+            # IS_SINGLE_CERTIFICATE: 1 if you want to get only a single certificate for specified domains
         volumes:
           - ./conf.d:/etc/nginx/user.conf.d:ro
           - letsencrypt:/etc/letsencrypt
